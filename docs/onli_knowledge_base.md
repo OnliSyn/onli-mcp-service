@@ -103,3 +103,33 @@ The **Brands** slide deck explained Onli’s fundamental differentiator: it solv
 Onli provides a groundbreaking approach to digital asset management. By combining cryptographic uniqueness with secure identity and actual possession, Onli enables a vast array of applications that benefit from authenticity, provenance and owner control. The use cases outlined here demonstrate how Genomes, Genes, Vaults and Appliances can reshape industries ranging from education and healthcare to finance and government. Unlike blockchains, Onli has no global ledger, no mining and no tokens. Instead, it offers a **private-by-default** network where assets move directly between owners and the proof of transfer is recorded in an **Oracle** only as needed for verification.
 
 Organizations adopting Onli can start with small pilots — perhaps issuing credentials or managing sensitive documents — and expand to more complex scenarios like microcurrency and micro-commodity exchanges. For consumers, Onli means personal data can be truly yours, stored in your Vault and shared only when you decide. For enterprises, Onli offers a way to manage digital assets that is secure, compliant and aligned with real-world ownership. As digital transformation accelerates and the value of data grows, Onli’s model of unique, self-contained digital objects may become a foundation for the next generation of data storage and control.
+
+### History & Founders
+
+Onli was founded in 2010 by Dhryl Anton, Michael Mcfall, Peter Jenson Haxel, and Michaela Katherine Anton. These founders envisioned a new paradigm for digital ownership and data storage, leading to the development of Onli’s Genomes, Genes and Vaults architecture.
+
+### Knowledge Graph Overview
+
+The core entities in the Onli ecosystem are:
+
+- **OnliOne** – A private computing network of hyper-dimensional vector storage systems. It contains Vaults and Owners and provides uniqueness quantification across a network of connected devices.
+- **Vaults** – Self-contained execution environments within OnliOne. Vaults store Genomes (Assets) and Genes (Owner identities) and provide actual possession storage of Assets.
+- **Asset** – A branded Genome within OnliOne. The generic term for an Onli Asset is an “Onli.”
+- **Genome** – A hyperdimensional vector storage object within a Vault. Each Genome contains 10 Helices and represents a unique object.
+- **Helix** – A hyperdimensional vector that is part of a Genome. Each Helix contains 10 Base Pairs and stores data segments related to different facets of the object’s dimensions.
+- **Base Pair** – The fundamental data representation within a Helix. Each Base Pair stores an attribute–value pair.
+- **Gene** – A special Genome representing an owner’s digital identity. Genes contain agents for security, identity, authentication and authorization and reside within Vaults and Owners.
+- **Agents** – Autonomous programs that compute Base Pairs and enforce logic. Agents are part of OnliOne and live inside Vaults.
+- **Owners** – Human users of OnliOne who possess Genes, own Assets (Genomes) and use Vaults to store their balances of Assets and capabilities.
+- **Issuers** – Special users of OnliOne who mint Assets. Issuers own Treasuries and issue Assets to Owners.
+- **Treasury** – A special Vault used to store newly minted, unissued Assets.
+- **Mint** – A special Vault containing algorithms for generating unowned Genomes.
+- **Appliances** – Applications running on the ONLI Cloud OS. Appliances interact with Owners and implement business logic using Onli’s Genomes and Genes.
+- **ONLI Cloud** – A cloud operating system that manages computing infrastructure for OnliOne. It interacts with developers via a gRPC API and hosts services such as the Replicated Validation Oracle, Transfer Agent and others.
+
+### Deployment & Pricing
+
+Onli is offered as enterprise software rather than a public blockchain network. Pricing reflects actual possession rather than network fees:
+
+- **Developer subscription** – The base developer plan costs $500 per month (or $6,000 per year) for a team of three developers.
+- **Treasury issuance** – Issuers pay $50,000 per billion units issued (sold only in one-billion-unit increments) plus a one‑time $0.05 fee per issuance. There are no other recurring fees.
