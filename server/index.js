@@ -5,6 +5,11 @@ const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch
 
 // Hardcoded rule responses
 const RULES = [
+    {
+    match: q => /(what.*onli.*do|how.*use.*onli|onli.*capabilities)/i.test(q),
+    answer: "Onli is a kind of intelligible data that is stored in an OnliVault, a high-security database. To use an Onli you need to build an appliance that connects to the Onli Cloud."
+  },
+
   {
     match: q => /(price|pricing|cost).*developer/i.test(q),
     answer: "Developers: $500/month or $6,000/year for a team of 3. Treasury: $50,000 per billion units (sold in billion-unit increments) + $0.05 per issue. No other fees."
