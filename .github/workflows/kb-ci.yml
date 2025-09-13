@@ -1,0 +1,18 @@
+name: KB CI
+on:
+  push: { branches: ["**"] }
+  pull_request:
+jobs:
+  kb:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm ci
+      - run: npm run build:kb-index
+      - run: npm run lint:canon
+      - run: npm test
+      - name: Upload index (artifact)
+        uses: actions/upload-artifact@v4
+        with: { name: kb-index, path: kb-index.json }
