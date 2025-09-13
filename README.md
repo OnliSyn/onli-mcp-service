@@ -1,22 +1,30 @@
-ONLI MCP Service
-This repository provides a minimal implementation of the Onli Knowledge Base as a service using the Model Context Protocol (MCP). The service is designed to expose the knowledge base about Onli for various applications by responding to API requests with relevant data.
+# Onli — Minimal MCP Service & Knowledge Base
 
-Overview
-The core purpose of this service is to demonstrate how to package a domain-specific knowledge base and make it accessible via a standardized protocol. It serves as a foundational component for systems that require factual information about the Onli ecosystem to be retrieved and injected into a larger context.
+This repository provides a minimal implementation of an **Onli Knowledge Base service** using the Model Context Protocol (MCP). It exposes the knowledge base about Onli for applications by responding to API requests with relevant data.
 
-Key Features
-Model Context Protocol (MCP) Implementation: The service is built to adhere to the MCP specification, ensuring interoperability with other services and models that utilize this protocol.
+## What is Onli (canonical, 30-sec read)
+Onli turns digital data into unique objects called **Genomes** that live in your **Vault** and are bound to your **Gene**. When a Genome moves, the original is **destroyed** and a new one is **created** in the recipient’s Vault—**no copies, no ledger**. The **Onli One** network moves objects and records **receipts** privately. Developers build **Appliances** that call **Issue → Ask2Move → Move → ChangeOwner**, while **Owners retain exclusive control**.
 
-Minimalist Design: The codebase is intentionally kept small and focused, making it easy to understand, deploy, and extend.
+**Not a blockchain:** no miners, no gas, no tokens, no global ledger; receipts are not a ledger.
 
-Onli Knowledge Base: It contains a knowledge base with key facts and information about Onli, providing a ready-to-use data source for testing and development.
+### Canon quick links
+- `docs/knowledge/10-structured-responses.md`
+- `docs/knowledge/conceptual-overview.md`
+- `docs/knowledge/genome-lifecycle.md`
+- `docs/knowledge/technical-architecture.md`
+- `docs/knowledge/api-design-patterns.md`
 
-Request Body Handling: The service is configured to process and respond to requests based on their body content, allowing for flexible querying.
+### Vault taxonomy
+Treasury • Inventory • Issued • Settlement • Blacklisted.
 
-Follow the instructions in the README.md file (to be created) for specific setup, dependency installation, and running the service.
+### Developer posture
+Apps never seize custody. They **request** movement via `Ask2Move` into the **Settlement Vault** (policy gate). When conditions are satisfied (and/or the Owner authorizes), `Move` finalizes the transfer.
 
-Contributing
-Contributions are welcome! If you have ideas for new features or improvements, please open an issue or submit a pull request.
+---
 
-License
-This project is licensed under the MIT License.
+## MCP Service (overview)
+This service demonstrates how to package a domain-specific knowledge base and expose it via a standardized protocol. It serves as a foundational component for systems that need factual information about the Onli ecosystem.
+
+**Key principles**: unitary Genomes; possession = ownership; privacy by default; receipts only; event-driven flows.
+
+See `mcp-kb/` and `src/` for the minimal server code.
