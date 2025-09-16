@@ -1,102 +1,359 @@
-# ONLI — Comprehensive Knowledge Base & Knowledge Graph
+# Onli Knowledge Base – MCP Server (Updated Technical Specs)
 
-> Precise, technical definitions for the ONLI system and ecosystem.
+This knowledge base provides a consistent and accurate description of each RPC/REST method available in the Onli ecosystem.  For each endpoint, the purpose, official resources (Buf.Build protocol buffers and Postman collection), example request/response pairs and implementation notes are documented.  When applicable, further notes describe important status values, time‑outs, prerequisites and follow‑up actions.
 
----
+## Onli Cloud API
 
-## What is an Onli?
-Onli is a **hyperdimensional vector storage system** where data containers are arranged as three-dimensional tensor arrays, each coupled with an unforgeable credential called a **Gene**. Assets are branded Onli containers that function as non-fungible micro-currencies or commodities, stored in **Onli Vaults** and managed through **OnliCloud**. Owners, identified by Gene credentials, store Assets in Vaults and connect peer-to-peer via the **Onli One Network**, with exclusive transfer rights over their Assets.
+### Issue – Mint assets from Treasury to an Owner
 
----
+| Field | Description |
+|---|---|
+| **What it does** | Mint (issue) new Genomes from the Treasury Vault to an Owner’s Vault.  The caller specifies the recipient (`to`), the application symbol (`app_symbol`), the total face value (`amount`), and the destination device (`which_device`: `cloud`/`desktop`/`mobile`).  Genomes can be issued by amount or by specifying pre‑minted `onli_ids`【870736586076395†screenshot】. |
+| **Buf.Build** | [onli‑cloud](https://buf.build/onlicorp/onli-cloud) – protocol buffer definitions for Onli Cloud RPC. |
+| **Postman** | [Onli Cloud API collection](https://postman.com/onlicorp/onli/collection/6797acdc69c951396fe48843) – interactive requests for Onli Cloud endpoints. |
 
-## What is the Onli Ecosystem?
-The **Onli Ecosystem** is the integrated environment built around Onli’s hyperdimensional vector storage. Data containers (Genomes) are coupled with Gene credentials, creating non-fungible, tamper-resistant assets. Assets are managed in Vaults and orchestrated through OnliCloud, while ownership and transfer are enforced on the peer-to-peer **Onli One Network**. 
+#### Example request
+```json
+{
+  "to": "usr-abc123",
+  "app_symbol": "ENGMA",
+  "amount": 10,
+  "which_device": "cloud"
+}
+```
 
-Genomes can also store **vector embeddings**, making them powerful for identity management, agentic applications, and AI search. The ecosystem includes Owners, Vaults, Genes, OnliCloud, Appliances, and the peer-to-peer Onli One Network.
+#### Example response
+```json
+{
+  "issue_id": "iss-0c6af7",
+  "issued_at": "2025-09-03T03:00:00Z",
+  "owner_changed_at": "2025-09-03T03:00:00Z",
+  "delivered_at": "2025-09-03T03:00:00Z",
+  "pkg_tag": "pkg-33b8"
+}
+```
 
----
-
-## What is an Appliance?
-An **Onli Powered Appliance** is a client or server application built by developers using **Onli Cloud APIs**. Appliances do not store or process the content of Genomes; instead, they manage connections between Owners, orchestrate transactions using Onli Cloud APIs, and enforce business rules defined by the developer. They serve as the interface layer between OnliCloud and end-users.
-
----
-
-## What is Onli You?
-**Onli You** is a free application (available on mobile or desktop) that allows Owners to interact with assets stored in their Vaults. It includes an authenticator for secure identity management. Each Vault is bound to a Gene credential and provides isolated, tamper-resistant storage for non-fungible assets functioning as micro-currencies or commodities.
-
----
-
-## What is Onli Cloud?
-**Onli Cloud** is the **management layer for true digital ownership**. It is where developers build Appliances and where Owners manage functions tied to their hyperdimensional containers. Assets themselves live and move on **Onli One**, the peer-to-peer network that enforces possession. Only the Owner can execute a transfer; Appliances can request actions but cannot move an asset independently. Onli Cloud ensures that **developers innovate, Appliances orchestrate, and Owners stay fully in control**.
-
----
-
-## What can you do with Onli?
-With **Onli Cloud**, developers can build innovative Appliances, Appliances orchestrate secure interactions and transactions, and Owners retain exclusive control over their assets. This enables:
-- Creation and issuance of unique digital assets (Genomes)
-- Secure storage and management of assets in Vaults
-- Peer-to-peer transfers validated by Owner authorization
-- Integration with agentic and AI-driven applications using vector embeddings
-- New forms of non-fungible micro-currencies, commodities, and digital credentials
-
----
-
-## Core Concepts & Canon
-
-Drawing from the whitepaper 【88†Onli_Whitepaper_36_2025.docx】, the **Core Concepts & Canon** establish the foundation of ONLI:
-
-### Ownership Canon
-- **Use**: The right to exercise the functions of a Genome, such as accessing, processing, or consuming the asset’s capabilities.
-- **Exclude**: The cryptographic guarantee that only the holder of the Gene credential can interact with a Genome; unauthorized duplication is mathematically impossible.
-- **Transfer**: Atomic, irreversible transfers of ownership, cryptographically enforced and verifiable. No administrative override exists.
-- **Destroy**: Permanent, verifiable deletion of Genomes, supporting both lifecycle management and regulatory compliance.
-
-### The Triad of Trust
-ONLI’s architecture rests on three interlocking components:
-- **Genomes**: Cryptographically unique digital entities that cannot be copied or duplicated without authorization, providing genuine digital scarcity.
-- **Genes**: Unforgeable cryptographic credentials that provide mathematical proof of ownership and authorization.
-- **Vaults**: Hardware-enforced secure enclaves (via Trusted Execution Environments) ensuring Genomes can only be accessed in isolated, verifiable environments.
-
-### Uniqueness-Quantification Problem
-ONLI directly addresses the long-standing challenge in digital systems: establishing uniqueness and verifiable scarcity in environments where information can be copied infinitely. ONLI’s design ensures:
-- **Cryptographic Uniqueness**: Each Genome is mathematically singular.
-- **Capability-Based Ownership**: Genes encode rights as cryptographic capabilities, replacing traditional access control.
-- **Hardware-Enforced Isolation**: Vaults prevent unauthorized access even from privileged administrators.
-
-### Paradigm Shift
-ONLI reframes digital asset management from:
-- **Files → Genomes** (singular entities)
-- **Security → Control** (cryptographic guarantees)
-- **Access → Ownership** (capability-based possession)
-
-This canon provides the philosophical and technical bedrock for true digital ownership.
+#### Extra notes
+- The `IssueInput` message also supports an optional `onli_ids` array for issuing specific Genome IDs; when provided the `amount` parameter is ignored【575778553593422†screenshot】.
+- The caller must pay a one‑time issuance fee of $0.05 per asset; the fee is credited to the developer account【870736586076395†screenshot】.
+- Issuances may be classified as **amount‑based** (creating new Genomes) or **ID‑based** (assigning pre‑minted Genomes) depending on the `genus` category【575778553593422†screenshot】.
 
 ---
 
-## 3. Entities & Data Models
+### AskToMove – Request owner authorization to move assets
 
-> Canonical objects, identifiers, and JSON shapes. Names align with the **knowledge-base-refactor** branch.
+| Field | Description |
+|---|---|
+| **What it does** | Initiates a stream that asks an Owner to move a specified amount of Genomes from their Vault into a **Settlement Locker**.  The request body includes the recipient (`to`), face value (`amount`), app symbol (`app_symbol`), settlement duration in hours (`add_settle_time`), and a **note** containing `behavior` and `body` strings.  The owner is notified via Onli You and must accept or deny the request【213832094324533†screenshot】. |
+| **Buf.Build** | [onli‑cloud](https://buf.build/onlicorp/onli-cloud). |
+| **Postman** | [Onli Cloud API collection](https://postman.com/onlicorp/onli/collection/6797acdc69c951396fe48843). |
 
-### 3.1 Owner & Onli_ID
-**Purpose**: Represents a person or organization that possesses Genomes. Onli_ID provides authentication/authorization context.
+#### Example request
+```json
+{
+  "add_settle_time": 2,
+  "amount": 5,
+  "app_symbol": "ENGMA",
+  "note": {
+    "behavior": "Transfer",
+    "body": "Settlement for invoice #123"
+  },
+  "to": "usr-xyz789"
+}
+```
 
-**Identifiers**
-- `identity.onli_you_id` (`usr-…`) — globally unique user/owner id
-- Optional external ids (appliance-scoped): `context.appliances.<APP>.external_id`
+#### Example response
+```json
+{
+  "ask_to_move_id": "ask-91h8q",
+  "pkg_tag": "pkg-0bd3",
+  "to": "usr-xyz789",
+  "note": {
+    "behavior": "Transfer",
+    "body": "Settlement for invoice #123"
+  },
+  "amount": 5,
+  "app_symbol": "ENGMA",
+  "asset_balance": 5,
+  "notified_at": "2025-09-03T03:00:00Z",
+  "status": "OPEN",
+  "expires_at": "2025-09-03T05:00:00Z",
+  "behavior_status": "ASKED",
+  "authorization_status": "ASKED",
+  "auth_log_id": "auth-2f7bc"
+}
+```
 
-**Constraints**
-- `identity.onli_you_id` is immutable once issued
-- Appliance context is namespaced under `context.appliances.<APP_SYMBOL>`
+#### Extra notes
+- **Request status values**: `ASKED` (awaiting owner), `DENIED`, `OPEN` (approved and locker open), `ASKED_EXPIRED`, `OPEN_EXPIRED`, `CLOSED`, `HOLD`, `RETURNED`, `FAILED`【545100419203769†screenshot】.  The field `expires_at` corresponds to `add_settle_time` hours after creation【579495501361477†screenshot】.
+- **Stream workflow**: 1. Appliance sends `AskToMoveReq` → 2. Owner receives notification → 3. Owner accepts/denies via Onli You → 4. `AskToMoveRecord` returns the status and metadata → 5. If accepted the assets move to Settlement Locker (locked) → 6. If assets are unused when `expires_at` passes, they return to the owner【579495501361477†screenshot】.
+- **Settlement Locker behavior**: Assets in the Locker can only be used in a subsequent `ChangeOwner` call.  If no ChangeOwner occurs before expiry, assets automatically return to the owner【577889575680366†screenshot】.
+- Appliances should monitor the `ask_to_move_id` and call `GetAskToMoveRecord` or `ChangeOwner` once the owner accepts【577889575680366†screenshot】.
 
-**Owner Object (appliance-scoped view)**
+---
+
+### ChangeOwner – Transfer ownership of Genomes (requires AskToMove)
+
+| Field | Description |
+|---|---|
+| **What it does** | Completes a transfer authorized via an **AskToMove** request.  Moves Genomes from the Settlement Locker to the recipient’s Vault and performs any necessary genome‑evolution (editing).  Requires the previous owner (`from`), new owner (`to`), the `ask_to_move_id` from the open AskToMove request, the app symbol, amount, and destination device (`which_device`)【727112441892813†screenshot】. |
+| **Buf.Build** | [onli‑cloud](https://buf.build/onlicorp/onli-cloud). |
+| **Postman** | [Onli Cloud API collection](https://postman.com/onlicorp/onli/collection/6797acdc69c951396fe48843). |
+
+#### Example request
+```json
+{
+  "from": "usr-abc123",
+  "to": "usr-xyz789",
+  "ask_to_move_id": "ask-91h8q",
+  "app_symbol": "ENGMA",
+  "amount": 5,
+  "which_device": "cloud"
+}
+```
+
+#### Example response
+```json
+{
+  "ask_to_move_id": "ask-91h8q",
+  "evolve_id": "evo-7d2c5",
+  "received_at": "2025-09-03T03:05:00Z",
+  "owner_evolved_at": "2025-09-03T03:05:01Z",
+  "delivered_at": "2025-09-03T03:05:02Z"
+}
+```
+
+#### Extra notes
+- **Prerequisite**: the associated `AskToMove` record must be in the `OPEN` state and the `amount` and `app_symbol` must match the AskToMove request【727112441892813†screenshot】.
+- **Process flow**: (1) Validate prerequisites (open AskToMove, same app symbol and amount); (2) Access Genomes in the Settlement Locker; (3) Evolve genomes (gene editing if necessary); (4) Transfer ownership to new owner; (5) Deliver genomes to destination device; (6) Return completion details【213303038435885†screenshot】.
+- **Split delivery**: For multi‑recipient transfers, use the `ChangeOwners` variant (not fully documented but supported by Onli Cloud API).  The process locks assets once and splits them among recipients.
+
+---
+
+### AuthenticateOwner – Authenticate an Owner via Onli ID
+
+| Field | Description |
+|---|---|
+| **What it does** | Bi‑directional stream used to authenticate an Owner for Onli One.  The appliance sends an `AuthenticateOwnerReq` containing the `owner` ID, `app_symbol` and a human‑readable `body`; the server responds with an `AuthenticateOwnerRecord` containing the `authentication_status` and the owner’s cloud vault asset balance【46633015438569†screenshot】.  Optional `rev_string` may be provided for **reverse‑MFA** (gene + master string) or future reverse‑hash methods【46633015438569†screenshot】. |
+| **Buf.Build** | [onli‑cloud](https://buf.build/onlicorp/onli-cloud). |
+| **Postman** | [Onli Cloud API collection](https://postman.com/onlicorp/onli/collection/6797acdc69c951396fe48843). |
+
+#### Example request (basic auth)
+```json
+{
+  "owner": "usr-abc123",
+  "app_symbol": "ENGMA",
+  "body": "Please authenticate to view your assets"
+}
+```
+
+#### Example response (basic auth)
+```json
+{
+  "owner": "usr-abc123",
+  "auth_log_id": "auth-7d8ef",
+  "authentication_status": "AuthenticationStatusACCEPTED",
+  "auth_type": "BASIC",
+  "asset_balance": 14
+}
+```
+
+#### Example request (reverse MFA)
+```json
+{
+  "owner": "usr-abc123",
+  "app_symbol": "ENGMA",
+  "body": "Reverse MFA example",
+  "rev_string": "123456"
+}
+```
+
+#### Example response (reverse MFA)
+```json
+{
+  "owner": "usr-abc123",
+  "auth_log_id": "auth-8c9fa",
+  "authentication_status": "AuthenticationStatusACCEPTED",
+  "auth_type": "REVERSE_MFA",
+  "rev_string": "123456",
+  "asset_balance": 14
+}
+```
+
+#### Extra notes
+- **Authentication methods**: `BASIC` (gene only), `REVERSE_MFA` (gene + master string), `REVERSE_HASH` (future).  The server determines the method based on presence of `rev_string`【46633015438569†screenshot】.
+- **Status values**: `ASKED`, `ACCEPTED`, `DENIED`, `EXPIRED`【753296078842208†screenshot】.
+- Use the returned `auth_log_id` to audit the authentication via the `AuthLog` endpoint.
+
+---
+
+### AuthorizeBehavior – Authorize specific owner behavior
+
+| Field | Description |
+|---|---|
+| **What it does** | Allows an appliance developer (master user) to request authorization from an Owner to perform a specific behavior (e.g., login, view).  The `AuthorizeBehaviorReq` includes the `owner` ID, `app_symbol`, a `note` describing the behavior, the `behavior` string and a `body` message【831303745877724†screenshot】.  The Owner responds via Onli You; the returned `AuthorizeBehaviorRecord` provides status and timestamp. |
+| **Buf.Build** | [onli‑cloud](https://buf.build/onlicorp/onli-cloud). |
+| **Postman** | [Onli Cloud API collection](https://postman.com/onlicorp/onli/collection/6797acdc69c951396fe48843). |
+
+#### Example request
+```json
+{
+  "owner": "usr-abc123",
+  "app_symbol": "ENGMA",
+  "note": {
+    "behavior": "login"
+  },
+  "behavior": "login",
+  "body": "Authorize login from new device"
+}
+```
+
+#### Example response
+```json
+{
+  "owner": "usr-abc123",
+  "auth_log_id": "auth-5d6f8",
+  "authentication_status": "ACCEPTED",
+  "app_symbol": "ENGMA",
+  "note": {
+    "behavior": "login"
+  },
+  "behavior": "login",
+  "body": "Authorize login from new device"
+}
+```
+
+#### Extra notes
+- **Default behaviors**: `move` (authorize moving Genomes), `BEHAVIOR` (custom behaviors such as login or 2FA)【199197874605101†screenshot】.
+- **Authorization status values**: `ASKED`, `ACCEPTED`, `DENIED`, `EXPIRED`【199197874605101†screenshot】.
+- After authorization, use the returned `auth_log_id` with `AuthLog` for audit logs.
+
+---
+
+### AuthLog – Retrieve authentication/authorization records
+
+| Field | Description |
+|---|---|
+| **What it does** | Returns an immutable record of a prior authentication or authorization event.  Callers provide the `auth_log_id` and `app_symbol`, and the service returns detailed information including timestamps, security method used, appliance, geo data, request/response payloads and error messages【277536536620421†screenshot】. |
+| **Buf.Build** | [onli‑cloud](https://buf.build/onlicorp/onli-cloud). |
+| **Postman** | [Onli Cloud API collection](https://postman.com/onlicorp/onli/collection/6797acdc69c951396fe48843). |
+
+#### Example request
+```json
+{
+  "app_symbol": "ENGMA",
+  "auth_log_id": "auth-5d6f8"
+}
+```
+
+#### Example response (simplified)
+```json
+{
+  "AuthLogId": "auth-5d6f8",
+  "TS": "2025-09-03T03:05:00Z",
+  "WhichSecurityMethod": "authorize_behavior",
+  "WhichAppliance": "ENGMA",
+  "GeoData": {
+    "ip": "198.51.100.42",
+    "country": "US"
+  },
+  "Request": {
+    "owner": "usr-abc123",
+    "behavior": "login"
+  },
+  "Response": {
+    "authentication_status": "ACCEPTED"
+  },
+  "Err": null
+}
+```
+
+#### Extra notes
+- `AuthLog` entries form an **immutable chain** of records for every security event such as `ask_to_move_stream`, `authenticate_owner`, `authorize_behavior`, `issue` and `change_owner`【112648869039441†screenshot】.
+- Use cases include auditing, debugging, analytics, compliance and troubleshooting【112648869039441†screenshot】.
+
+---
+
+## Onli ID (Owners) API
+
+### CreateOwner – Provision a new Owner
+
+| Field | Description |
+|---|---|
+| **What it does** | Creates a new **Owner** object tied to a pre‑minted `onli_you_id`.  When called, the service invites the new Owner via email and SMS and assigns the user to the specified appliance.  The request includes `identity` fields (onli_you_id, email, phone), `context.appliances` containing the application’s config (user class, behaviors) and optional `user_class` for classification【561028255103071†screenshot】. |
+| **Buf.Build** | [onli‑id](https://buf.build/onlicorp/onli-id) – protocol definitions for Onli ID RPC. |
+| **Postman** | [Onli ID API collection](https://postman.com/onlicorp/onli/collection/6797a4d869c95139fe47855). |
+
+#### Example request
+```json
+{
+  "data": {
+    "identity": {
+      "onli_you_id": "usr-319d53bc-cf9b-5cea-9ec7-e6863a35b450",
+      "email": "new.owner@example.com",
+      "phone": "+1-555-0100"
+    },
+    "context": {
+      "appliances": {
+        "ENGMA": {
+          "user_class": "T1",
+          "user_behaviors": ["move", "login"]
+        }
+      }
+    }
+  }
+}
+```
+
+#### Example response
+```json
+{
+  "identity": {
+    "onli_you_id": "usr-319d53bc-cf9b-5cea-9ec7-e6863a35b450"
+  }
+}
+```
+
+#### Extra notes
+- Requires `user_id` (master ID) and `app_key` (appliance key) obtained during developer registration【304969497117561†screenshot】.
+- The `user_behaviors` list defines which behaviors the Owner is allowed to authorize (e.g., `move`, `login`).  The caller cannot modify identity data after creation【185190462999493†screenshot】.
+
+---
+
+### GetOwner – Retrieve an Owner’s full profile
+
+| Field | Description |
+|---|---|
+| **What it does** | Returns a complete **Owner** object and associated appliance data.  The request requires the `app_symbol` and `onli_you_id`.  The response includes identity fields (name, email, address, phone, status), context, and `appliances.{app_symbol}` containing the owner’s status, class, and custom `extra` JSON【386655914700478†screenshot】. |
+| **Buf.Build** | [onli‑id](https://buf.build/onlicorp/onli-id). |
+| **Postman** | [Onli ID API collection](https://postman.com/onlicorp/onli/collection/6797a4d869c95139fe47855). |
+
+#### Example request
+```json
+{
+  "app_symbol": "ENGMA",
+  "onli_you_id": "usr-abc123"
+}
+```
+
+#### Example response (truncated)
 ```json
 {
   "identity": {
     "onli_you_id": "usr-abc123",
     "first_name": "Alice",
+    "alt_name": null,
     "last_name": "Nguyen",
     "email": "alice@example.com",
+    "alt_email": null,
+    "username": "alice.nguyen",
+    "address_line1": "123 Main St",
+    "city": "Phoenix",
+    "state": "AZ",
+    "postal": "85001",
+    "country": "US",
     "phone": "+1-555-0100",
+    "company": "Example Co.",
     "status": "STATUS_ACTIVE"
   },
   "context": {
@@ -104,7 +361,6 @@ This canon provides the philosophical and technical bedrock for true digital own
       "ENGMA": {
         "user_class": "T1",
         "status": "STATUS_APP_ACTIVE",
-        "external_id": "crm-42",
         "extra": "{\"group\":\"enterprise\"}"
       }
     }
@@ -112,638 +368,200 @@ This canon provides the philosophical and technical bedrock for true digital own
 }
 ```
 
----
-
-### 3.2 Genome
-**Purpose**: Unitary, non-fungible digital container; may hold payloads (documents, credentials) or vector embeddings.
-
-**Identifiers**
-- `genome_id` (`gnm-…`) — unique genome handle
-- `fingerprint` — content/address hash (e.g., BLAKE3)
-
-**Core Fields**
-```json
-{
-  "genome_id": "gnm-7h2k1",
-  "fingerprint": "b3:9f…",
-  "type": "ASSET|CREDENTIAL|EMBEDDING",
-  "payload_ref": "opaque-blob-ref",
-  "metadata": {
-    "name": "Invoice #1287",
-    "tags": ["finance","2025-Q3"],
-    "created_at": "2025-08-01T12:03:04Z"
-  },
-  "policy": {
-    "transferable": true,
-    "destroyable": true,
-    "capabilities": ["redeem","prove"]
-  }
-}
-```
-**Constraints**
-- Indivisible (no partial transfers)
-- Atomic transfer (no copy-on-send)
+#### Extra notes
+- Use `GetOwner` to verify updates after `CreateOwner` or `UpdateOwner`【170243015355788†screenshot】.
+- For a lightweight lookup of a single attribute, use `FetchOwner` instead.
 
 ---
 
-### 3.3 Gene (Credential)
-**Purpose**: Unforgeable credential binding an Owner to authorizations over a Genome or Vault.
+### FetchOwner – Fetch a single attribute of an Owner
 
-**Fields**
-```json
-{
-  "gene_id": "gne-3xp9t",
-  "public_key": "ed25519:…",
-  "holder": "usr-abc123",
-  "scopes": ["authenticate","authorize","delegate"],
-  "created_at": "2025-07-20T10:10:10Z",
-  "expires_at": null
-}
-```
-**Notes**
-- May issue **derived credentials** with narrowed scopes/time windows for delegation.
+| Field | Description |
+|---|---|
+| **What it does** | Lightweight method that returns one attribute from an Owner object.  Specify `condition` (e.g., `identity.username`, `identity.email`, `context.appliances.ENGMA.status`) along with `app_symbol` and `onli_you_id`.  The service returns only the requested data【60182787606528†screenshot】. |
+| **Buf.Build** | [onli‑id](https://buf.build/onlicorp/onli-id). |
+| **Postman** | [Onli ID API collection](https://postman.com/onlicorp/onli/collection/6797a4d869c95139fe47855). |
 
----
-
-### 3.4 Vaults
-**Purpose**: Secure storage/compute containers bound to a Gene; enforce possession.
-
-**Types**
-- `OWNER_VAULT` — personal/organizational possession
-- `TREASURY_VAULT` — issuer inventory
-- `SETTLEMENT_LOCKER` — temporary holding during workflows
-
-**Vault Record**
-```json
-{
-  "vault_id": "vlt-x2a91",
-  "kind": "OWNER_VAULT",
-  "owner": "usr-abc123",
-  "gene": "gne-3xp9t",
-  "attestation": {
-    "tee": "sevsnp-1.2",
-    "quote": "…",
-    "verified_at": "2025-09-01T15:22:31Z"
-  }
-}
-```
-
----
-
-### 3.5 Appliances
-**Purpose**: Client/server applications using Onli Cloud APIs to orchestrate flows and enforce business rules without accessing Genome contents.
-
-**Appliance Registration (Cloud)**
+#### Example request
 ```json
 {
   "app_symbol": "ENGMA",
-  "app_key": "appk_live_…",
-  "name": "Engma Markets",
-  "callbacks": {
-    "auth_webhook": "https://engma.example.com/onli/auth",
-    "events": "https://engma.example.com/onli/events"
-  }
-}
-```
-
-**Per-Owner Linkage**
-```json
-{
   "onli_you_id": "usr-abc123",
+  "condition": "identity.username"
+}
+```
+
+#### Example response
+```json
+{
+  "data": "alice.nguyen"
+}
+```
+
+#### Extra notes
+- Common conditions include `identity.username`, `identity.email`, `identity.status`, `context.appliances.{app_symbol}.user_class`, `.status`, `.extra`【468911895833135†screenshot】.
+- Ideal for caching and UI rendering; for full profiles use `GetOwner`【468911895833135†screenshot】.
+
+---
+
+### ListOwner – List owners associated with an appliance
+
+| Field | Description |
+|---|---|
+| **What it does** | Returns an array of Owner objects for a given `app_symbol`.  Supports optional `condition` to limit returned fields and `meta` for pagination (e.g., `meta.limit`).  Each Owner entry contains minimal identity and appliance data or the full profile depending on the condition【795456193825507†screenshot】. |
+| **Buf.Build** | [onli‑id](https://buf.build/onlicorp/onli-id). |
+| **Postman** | [Onli ID API collection](https://postman.com/onlicorp/onli/collection/6797a4d869c95139fe47855). |
+
+#### Example request
+```json
+{
   "app_symbol": "ENGMA",
-  "status": "STATUS_APP_ACTIVE"
+  "condition": "full",
+  "meta": {
+    "limit": 10
+  }
 }
 ```
 
----
-
-### 3.6 Oracle & Receipts
-**Oracle**: Authoritative record of issuances and ownership changes.
-
-**Receipt**
+#### Example response (simplified)
 ```json
 {
-  "receipt_id": "rcp-7f3m9",
-  "kind": "ISSUE|ASK_TO_MOVE|CHANGE_OWNER|CHANGE_OWNERS",
-  "subject": "gnm-7h2k1",
-  "from": "usr-issuer",
-  "to": "usr-abc123",
-  "amount": 1,
-  "timestamp": "2025-09-03T03:00:00Z",
-  "proof": "sig:ed25519:…"
-}
-```
-
----
-
-### 3.7 Movement Objects (Cloud API)
-**AskToMove** (request → settlement)
-```json
-{
-  "ask_to_move_id": "ask-91h8q",
-  "to": "usr-buyer",
-  "note": { "behavior": "sell", "body": "confirm sell of 1 unit" },
-  "amount": 1000000,
-  "asset_balance": 2500000,
-  "status": "open",
-  "expires_at": "2025-09-04T03:00:00Z"
-}
-```
-
-**ChangeOwner** (single)
-```json
-{
-  "change_order_id": "chg-1m2n3",
-  "from": "usr-seller",
-  "to": "usr-buyer",
-  "ask_to_move_id": "ask-91h8q",
-  "amount": 1000000,
-  "received_at": "2025-09-03T01:00:00Z",
-  "owner_changed_at": "2025-09-03T01:00:02Z",
-  "delivered_at": "2025-09-03T01:00:05Z"
-}
-```
-
-**ChangeOwners** (split delivery)
-```json
-{
-  "change_order_id": "chg-9k0p1",
-  "from": "usr-seller",
-  "sum_of": [
-    { "to": "usr-a", "amount": 250000 },
-    { "to": "usr-b", "amount": 750000 }
+  "data": [
+    {
+      "identity": {
+        "onli_you_id": "usr-abc123",
+        "first_name": "Alice",
+        "last_name": "Nguyen"
+      },
+      "context": {
+        "appliances": {
+          "ENGMA": {
+            "user_class": "T1",
+            "status": "STATUS_APP_ACTIVE"
+          }
+        }
+      }
+    },
+    {
+      "identity": {
+        "onli_you_id": "usr-def456",
+        "first_name": "Bob",
+        "last_name": "Johnson"
+      },
+      "context": {
+        "appliances": {
+          "ENGMA": {
+            "user_class": "T1",
+            "status": "STATUS_APP_INACTIVE"
+          }
+        }
+      }
+    }
   ],
-  "ask_to_move_id": "ask-77zzq",
-  "amount": 1000000
-}
-```
-
----
-
-### 3.8 Relationships (ER Graph)
-```mermaid
-graph LR
-  Owner((Owner))--holds-->Vault[Vault]
-  Vault--stores-->Genome[Genome]
-  Owner--has-->Gene[Gene]
-  Appliance--links-->Owner
-  Appliance--requests-->AskToMove
-  AskToMove--enables-->ChangeOwner
-  ChangeOwner--produces-->Receipt
-  Treasury[Treasury Vault]--sources-->Issue
-  Issue--delivers-->Genome
-  Oracle--records-->Receipt
-```
-
----
-
-## 4. API Capabilities (v3)
-
-… (existing text retained) …
-
----
-
-## 5. Processes & Movement Flows
-
-> End-to-end flows, consistent with Cloud API, Entities (§3), and ownership canon (§2).
-
-### 5.1 Issue → Possession
-**Flow**
-1. Appliance or issuer triggers `Issue` from Treasury Vault → Onli Cloud.
-2. Oracle records issuance; Receipt created.
-3. Genome delivered to Owner Vault; possession established.
-
-**Guarantees**
-- Atomic delivery (no duplicate issuance).
-- Cryptographic proof of uniqueness (Genome id, signature).
-- Receipt for provenance.
-
----
-
-### 5.2 AskToMove → Settlement → ChangeOwner
-**Flow**
-1. Appliance submits `AskToMove` → Onli Cloud.
-2. Owner receives authorization prompt (Onli ID → Authorize).
-3. Upon approval, assets move into Settlement Locker.
-4. Appliance requests `ChangeOwner` or `ChangeOwners`.
-5. Transfer Agent edits Genome state; atomic owner change.
-6. Delivery to receiver Vault(s).
-7. Oracle records event; Receipts issued.
-
-**Guarantees**
-- Only Owner can authorize movement (capability enforced by Gene).
-- Settlement Locker ensures pending transfers are isolated and reversible on timeout.
-- Atomicity: Genome ceases in sender Vault before appearing in receiver Vault(s).
-
----
-
-### 5.3 ChangeOwners (Split Delivery)
-**Flow**
-- Variant of ChangeOwner supporting multiple recipients in one order.
-- `sum_of[]` defines distribution of amount across recipients.
-- Oracle issues per-recipient Receipts.
-
-**Guarantees**
-- Conservation: sum of distributed amounts = requested amount.
-- Audit: Each recipient has a cryptographic receipt linked to the original AskToMove.
-
----
-
-### 5.4 Destroy (Retirement)
-**Flow**
-1. Owner requests Genome destruction.
-2. Vault performs verifiable cryptographic deletion.
-3. Oracle logs destruction Receipt.
-
-**Guarantees**
-- Compliance with regulatory frameworks (e.g., GDPR/CCPA “right to delete”).
-- Mathematical proof that the Genome state is unrecoverable.
-
----
-
-## 6. Knowledge Graph
-
-> Semantic representation of entities, flows, and relationships. Integrated from whitepaper (Triad of Trust), API, and knowledge-base schemas.
-
-### 6.1 Concept Graph (Entities & Relations)
-```mermaid
-graph TD
-  Owner((Owner))--has-->OnliID[Onli_ID]
-  OnliID--binds-->Gene[Gene]
-  Gene--controls-->Genome[Genome]
-  Owner--possesses-->Vault[Owner Vault]
-  Vault--stores-->Genome
-  Treasury[Treasury Vault]--sources-->Issue
-  Appliance--links-->Owner
-  Appliance--initiates-->AskToMove
-  AskToMove--locks-->Settlement[Settlement Locker]
-  Settlement--releases-->ChangeOwner
-  ChangeOwner--delivers-->ReceiverVault[Owner Vault]
-  Oracle--records-->Receipt
-```
-
-### 6.2 Sequence Diagrams
-**AskToMove + ChangeOwner**
-```mermaid
-sequenceDiagram
-  participant App as Appliance
-  participant Owner
-  participant Cloud as Onli Cloud
-  participant Vault
-  participant Oracle
-  App->>Cloud: AskToMove(to, amount, note)
-  Cloud-->>Owner: Authorization Request
-  Owner-->>Cloud: Approve via Onli ID
-  Cloud->>Vault: Lock assets in Settlement
-  App->>Cloud: ChangeOwner(from,to,amount)
-  Cloud->>Vault: Genome edit (atomic transfer)
-  Cloud->>Oracle: Record receipt
-  Vault-->>Owner: Delivery to receiver Vault
-```
-
-**Issue**
-```mermaid
-sequenceDiagram
-  participant Issuer
-  participant Cloud as Onli Cloud
-  participant Treasury as Treasury Vault
-  participant OwnerVault as Owner Vault
-  participant Oracle
-  Issuer->>Cloud: Issue(to, amount)
-  Cloud->>Treasury: Deduct
-  Cloud->>OwnerVault: Deliver Genome
-  Cloud->>Oracle: Record issuance receipt
-```
-
----
-
-## 7. Build Configurations
-
-> Schema-level templates that shape Genome behavior. Derived from whitepaper (ownership canon), knowledge-base-refactor, and API semantics.
-
-### 7.1 Denomination
-- Defines unit size, supply, and divisibility rules.
-- Example: `{ "unit": "USDc", "precision": 2, "supply": 100000000 }`
-- Ensures conservation in transfers (`ChangeOwner(s)`).
-
-### 7.2 Symmetric
-- Behavior invariants mirrored on send/receive.
-- Example: permissions, flags (redeemable, delegable) persist across transfers.
-- Implemented in Genome `policy.capabilities[]`.
-
-### 7.3 Series
-- Cohort of Genomes sharing provenance and policy.
-- Example: Issuance batch `series_id` linked to Oracle records.
-- Supports cataloging, treasury accounting, and compliance grouping.
-
-### 7.4 Compliance Hooks
-- Regulatory rules embedded as policy.
-- Example: auto-expiry, KYC-required transfer, region restrictions.
-- Enforced at API layer during AskToMove/ChangeOwner.
-
----
-
-
----
-
-## 5. Processes & Movement Flows
-
-> Operational lifecycles for issuance and transfer. Shapes and fields match §3 and §4.
-
-### 5.1 Roles
-- **Owner** — holds possession; must authenticate/authorize via **Onli_ID**.
-- **Appliance** — orchestrates business logic; never accesses Genome contents.
-- **Onli Cloud** — executes Issue/AskToMove/ChangeOwner(s); hosts **Oracle**, **Transfer Agent**, **Treasury**.
-- **Vaults** — `OWNER_VAULT`, `TREASURY_VAULT`, `SETTLEMENT_LOCKER`.
-
-### 5.2 Issue → Possession
-**Preconditions**: Issuer has inventory in Treasury; `to: onli_you_id` exists; `app_symbol/app_key` valid.
-
-**Flow**
-1) Appliance calls **Issue** `{to, app_symbol, app_key, amount}`.
-2) Cloud validates & reserves inventory in **Treasury Vault**.
-3) **Transfer Agent** writes new `genome_id`(s) and delivers to **Owner Vault**.
-4) **Oracle** records issuance; **Receipt** `{kind: ISSUE, subject: genome_id, to, amount, timestamps}`.
-
-**Postconditions**: Owner’s `asset_balance` increases; issuance is atomic; timestamps: `issued_at`, `owner_changed_at`, `delivered_at`.
-
-### 5.3 AskToMove → Settlement Locker
-**Intent**: Acquire explicit Owner authorization and move assets into a reversible, time‑boxed settlement state.
-
-**Flow**
-1) Appliance calls **AskToMove** `{to, note.behavior, amount, add_settle_time}`.
-2) Cloud notifies **Owner** (Onli You) → Owner **Authenticate** + **Authorize**.
-3) On approval, assets move from **Owner Vault** → **SETTLEMENT_LOCKER**.
-4) Cloud returns `{ask_to_move_id, status: "open", asset_balance, expires_at, auth_log_id}`.
-
-**Expiry**: If not consumed by `expires_at`, Cloud auto‑returns assets to **Owner Vault** and closes the ask.
-
-### 5.4 ChangeOwner (single)
-**Preconditions**: A matching `ask_to_move_id` is `open`; sufficient `amount` is in **SETTLEMENT_LOCKER**.
-
-**Flow**
-1) Appliance calls **ChangeOwner** `{from, to, ask_to_move_id, amount}`.
-2) Cloud validates ask + balances; invokes **Transfer Agent**.
-3) Genome edit + delivery to receiver **Owner Vault**.
-4) **Oracle** records `{kind: CHANGE_OWNER}`; Cloud returns `{change_order_id, change_id, received_at, owner_changed_at, delivered_at}`.
-
-**Postconditions**: Ask is consumed/closed; transfer is atomic and non‑duplicative.
-
-### 5.5 ChangeOwners (split delivery)
-Same as 5.4, but `sum_of[{to, amount}]` defines multiple recipients. Cloud returns `change_owner_receipts[]` per recipient.
-
-### 5.6 Failure & Reversal Conditions
-- **Authorization declined**: Ask remains closed with no movement.
-- **Expired ask**: Auto‑return to original **Owner Vault**; receipt records reason `expired`.
-- **Policy violation / insufficient balance**: ChangeOwner rejected; ask remains `open` (until expiry or retry) or is closed per policy.
-
-### 5.7 Sequence Diagrams
-**AskToMove + ChangeOwner**
-```mermaid
-sequenceDiagram
-  participant App as Appliance
-  participant Owner as Owner (Onli You)
-  participant Cloud as Onli Cloud
-  participant TA as Transfer Agent
-  participant Oracle as Oracle
-  App->>Cloud: AskToMove(to, behavior, amount, ttl)
-  Cloud-->>Owner: Authenticate & Authorize
-  Owner-->>Cloud: Approval (auth_log_id)
-  Cloud->>Owner: Move to SETTLEMENT_LOCKER (status: open)
-  App->>Cloud: ChangeOwner(from, to, ask_to_move_id, amount)
-  Cloud->>TA: Execute genome edit
-  TA-->>Cloud: change_id
-  Cloud->>Owner: Deliver to receiver vault
-  Cloud->>Oracle: Record receipt (CHANGE_OWNER)
-```
-
-**Issue**
-```mermaid
-sequenceDiagram
-  participant Issuer as Appliance/Issuer
-  participant Cloud as Onli Cloud (Treasury)
-  participant Owner as Owner Vault
-  participant Oracle as Oracle
-  Issuer->>Cloud: Issue(to, amount)
-  Cloud->>Owner: Deliver genome(s)
-  Cloud->>Oracle: Record receipt (ISSUE)
-```
-
----
-
-## 6. Knowledge Graph
-
-> Concept graph aligning entities, APIs, and receipts. Nodes/edges mirror §3 and §4.
-
-### 6.1 Concept Graph (Mermaid)
-```mermaid
-graph LR
-  subgraph Actors
-    Owner((Owner))
-    App[Appliance]
-  end
-  subgraph Identity
-    Gene[Gene]
-    OnliID[Onli_ID]
-  end
-  subgraph Storage
-    Vault[Vault]
-    Treasury[Treasury Vault]
-    Locker[Settlement Locker]
-  end
-  subgraph Objects
-    Genome[Genome]
-    Receipt[Receipt]
-  end
-  subgraph Cloud
-    Oracle[Oracle]
-    TA[Transfer Agent]
-  end
-
-  Owner--has-->Gene
-  Gene--binds-->OnliID
-  Owner--holds-->Vault
-  Vault--stores-->Genome
-  Treasury--sources-->Genome
-  App--links-->Owner
-  App--requests-->AskToMove[AskToMove]
-  AskToMove--locks-->Locker
-  App--triggers-->ChangeOwner[ChangeOwner(s)]
-  ChangeOwner--edits-->Genome
-  TA--executes-->ChangeOwner
-  Oracle--records-->Receipt
-  ChangeOwner--produces-->Receipt
-  Issue[Issue]--delivers-->Genome
-```
-
-### 6.2 Key Triples (selected)
-- `(Owner) —has credential→ (Gene)`
-- `(Gene) —authorizes→ (AskToMove)`
-- `(AskToMove) —locks→ (Settlement Locker)`
-- `(ChangeOwner) —delivers→ (Genome → Owner Vault)`
-- `(Oracle) —records→ (Receipt{kind})`
-
-### 6.3 Data Lineage
-- **Provenance**: `Receipt.kind ∈ {ISSUE, CHANGE_OWNER, CHANGE_OWNERS}` links `subject: genome_id` with `from/to` and timestamps.
-- **Identity**: `Gene.holder = onli_you_id` binds operations to Owners.
-- **Attestation**: `Vault.attestation.tee` and `quote` prove execution environment.
-
----
-
-## 7. Build Configurations
-
-> Project‑level configuration used to shape Genomes and enforce invariants.
-
-### 7.1 Denomination
-Defines unit sizing, precision, and inventory behavior for an issuance run.
-```json
-{
-  "denomination": {
-    "unit": "microunit",
-    "precision": 6,
-    "rounding": "HALF_UP",
-    "inventory": { "series_id": "SER-2025-Q3", "max_supply": 1000000000 }
-  }
-}
-```
-**Notes**: `precision` must match downstream accounting; `max_supply` caps Treasury issuance.
-
-### 7.2 Symmetric
-Declares invariants preserved across send/receive.
-```json
-{
-  "symmetric": {
-    "conservation": true,
-    "capabilities_persist": ["prove","redeem"],
-    "deny_list": ["derivative_splits:false"]
-  }
-}
-```
-**Notes**: Capabilities listed here are copied forward on **ChangeOwner(s)**.
-
-### 7.3 Series
-Defines issuance cohorts with shared provenance.
-```json
-{
-  "series": {
-    "series_id": "SER-ENGMA-001",
-    "oracle_channel": "ORC-ENGMA",
-    "lifecycle": { "mature_at": null, "retire_policy": "MANUAL" }
+  "meta": {
+    "limit": 10,
+    "offset": 0,
+    "count": 2
   }
 }
 ```
 
-### 7.4 Applying Build Configs
-- **At Issue**: Attach `denomination`, `series`, and initial `policy.capabilities` to the Genome metadata.
-- **At Transfer**: Enforce `symmetric` invariants; reject transfers that would violate conservation or capability persistence.
-- **At Destroy**: Validate against `lifecycle/retire_policy`.
+#### Extra notes
+- The `condition` parameter works like `FetchOwner`: e.g., `identity.email` returns only the email addresses【795456193825507†screenshot】.
+- `meta.limit` and `meta.offset` support pagination.  Unspecified fields default to 100 limit and offset 0【811347924791216†screenshot】.
+- Filtering may be performed client‑side after retrieving results.
 
-### 7.5 Consistency with §3–§4
-- `policy.capabilities` in **Genome** (§3.2) must superset any capabilities referenced by **symmetric**.
-- **Oracle Receipts** generated in §5 reflect `series_id` and `oracle_channel` for traceable provenance.
-- **Owners/Onli_ID** usage is unchanged; configs affect object behavior, not identity schema.
+---
 
-### 8. Canned Responses
+### UpdateOwner – Update appliance‑scoped attributes of an Owner
 
-## What is Onli (System Overview)
-- Onli is a hyper-dimensional vector storage system where data containers are arranged as three-dimensional tensor arrays, each coupled with an unforgeable credential called a Gene. Assets are branded Onli containers that function as non-fungible micro-currencies or commodities, stored in Onli Vaults and managed through OnliCloud. Owners, identified by Gene credentials, store Assets in Vaults and connect peer-to-peer via the Onli One Network, with exclusive transfer rights over their Assets.
-Genomes can also store vector embeddings, making them powerful for identity management, agentic applications, and AI search.
+| Field | Description |
+|---|---|
+| **What it does** | Updates an Owner’s appliance data.  Pass the `onli_you_id` under `identity`, and within `context.appliances.{app_symbol}` specify fields to change: `user_class`, `status`, and/or `extra` (escaped JSON).  Unspecified attributes remain unchanged【236791667172477†screenshot】. |
+| **Buf.Build** | [onli‑id](https://buf.build/onlicorp/onli-id). |
+| **Postman** | [Onli ID API collection](https://postman.com/onlicorp/onli/collection/6797a4d869c95139fe47855). |
 
-## What is an Appliance
-- An Onli Powered Appliance is a client or server application built by developers using Onli Cloud APIs. Appliances do not store or process the content of Genomes; instead, they manage connections between Owners, orchestrate transactions using Onli Cloud APIs, and enforce business rules defined by the developer. They act as the interface between Onli Cloud and end-users.
+#### Example request
+```json
+{
+  "data": {
+    "identity": {
+      "onli_you_id": "usr-319d53bc-cf9b-5cea-9ec7-e6863a35b450"
+    },
+    "context": {
+      "appliances": {
+        "ENGMA": {
+          "user_class": "new_class",
+          "extra": "{\"foo\":\"bar\"}"
+        }
+      }
+    }
+  }
+}
+```
 
-## What is Onli You
-- Onli You is a free application (available on mobile or desktop) that allows Owners to interact with their assets stored in Vaults. It includes an authenticator for secure identity management. Onli Vaults are secure storage containers within the Onli system where Assets are held. Each Vault is associated with a Gene credential and provides isolated, tamper-resistant storage for non-fungible Assets that function as micro-currencies or commodities.
+#### Example response
+```json
+{
+  "identity": {
+    "onli_you_id": "usr-319d53bc-cf9b-5cea-9ec7-e6863a35b450"
+  }
+}
+```
 
-## What is Onli Cloud
-- Onli Cloud is the management layer for true digital ownership. It is where developers build Appliances (applications that interact with assets) and where Owners manage the functions tied to their hyperdimensional containers. Assets themselves live and move on Onli One, the peer-to-peer network that enforces possession. Only the Owner can execute a transfer; Appliances can request actions, but they can never move an asset on their own. With Onli Cloud, developers innovate, Appliances orchestrate, and Owners stay fully in control.
+#### Extra notes
+- Updating only modifies specified attributes; other values remain unchanged【185190462999493†screenshot】.
+- If an attribute does not exist, it will be created.  Identity fields (name, email) cannot be updated via this method【185190462999493†screenshot】.
+- Use `extra` to store custom key‑value pairs as an escaped JSON string; ensure proper escaping【185190462999493†screenshot】.
+- Verify your update with `GetOwner` or `FetchOwner` after the call【185190462999493†screenshot】.
 
-### 9. Definitions
+---
 
-Definitions
+### AskToAddOwner – Invite an existing owner to join an appliance
 
-This document defines the core entities in the Onli ecosystem.
+| Field | Description |
+|---|---|
+| **What it does** | Serves as a notification to an existing Owner requesting membership in an appliance.  The request includes the existing owner’s `onli_you_id`, the inviting application’s `app_symbol`, an `appliance` configuration for the owner (e.g., `user_class`), and optional custom fields.  The owner must accept through Onli You, after which the owner becomes part of the appliance【671702057200284†screenshot】. |
+| **Buf.Build** | [onli‑id](https://buf.build/onlicorp/onli-id). |
+| **Postman** | [Onli ID API collection](https://postman.com/onlicorp/onli/collection/6797a4d869c95139fe47855). |
 
-## ONLI™
+#### Example request
+```json
+{
+  "data": {
+    "onli_you_id": "usr-afa3dae3-e37e-525e-927d-f65660dd2d30",
+    "app_symbol": "ENGMA",
+    "appliance": {
+      "user_class": "owner"
+    }
+  }
+}
+```
 
-A technology that ensures the unique quantification of stored and transferred data.
+#### Example response
+```json
+{
+  "onli_you_id": "usr-afa3dae3-e37e-525e-927d-f65660dd2d30",
+  "ask_to_add_owner_id": "61c81618-1455-41c6-b5b9-6a10d4be5612",
+  "app_symbol": "ENGMA"
+}
+```
 
-## OnliOne
+#### Extra notes
+- **Owner membership scenarios**: new owner creation (handled by `CreateOwner`), non‑existing owner request (via Onli You app), existing owner request (via AskToAddOwner), and app‑developer invitation (also AskToAddOwner)【932338722347767†screenshot】.
+- **Notification & queue system**: Developers receive membership requests through the **Appliance Tray Services** message queue; owners are notified via Onli You; track membership requests via the returned `ask_to_add_owner_id`【932338722347767†screenshot】.
+- Prerequisites: you must know the existing owner’s `onli_you_id` and have your `app_symbol` configured in the Appliance tray【932338722347767†screenshot】.
 
-A private computing network of hyper‑dimensional vector storage systems. It contains Vaults and Owners and enables uniqueness quantification across connected devices.
+---
 
-## Vaults
+## Summary of Buf.Build and Postman Collections
 
-Self‑contained execution environments functioning as OnliVaults – high‑security databases that store Onli (Genomes coupled with Genes). Each Vault enforces actual possession and is under the direct control of its owner. Vaults Vaults run in trusted execution environments (TEEs) and use hardware isolation to secure and execute computations on assets.
+- **Onli Cloud API**
+  - Buf.Build repository: `https://buf.build/onlicorp/onli-cloud` (protocol definitions for `Issue`, `AskToMove`, `ChangeOwner`, `AuthenticateOwner`, `AuthorizeBehavior`, `AuthLog` and related methods).
+  - Postman collection: `https://postman.com/onlicorp/onli/collection/6797acdc69c951396fe48843`.
 
-## Assets (Branded Genomes)
+- **Onli ID (Owners) API**
+  - Buf.Build repository: `https://buf.build/onlicorp/onli-id`.
+  - Postman collection: `https://postman.com/onlicorp/onli/collection/6797a4d869c95139fe47855`.
 
-An Asset is a branded Onli: a non‑fungible (unique) document tightly coupled to an unforgeable credential (Gene) and a protocol. It can represent micro‑currencies or micro‑commodities. Assets encapsulate value via a hyperdimensional tensor data model and protocol rules for movement, enforced by Genes and the trusted execution environment.
-
-## Genomes
-
-Genomes are hyperdimensional vector storage containers arranged as multi‑dimensional tensors (e.g., three‑dimensional arrays). Coupled with a Gene, they form an Onli. Instead of duplicating data, operations such as send or copy invoke the uniqueness quantification algorithm, which evolves the Genome's internal state. This ensures there is always one unique instance across all vaults.
-
-## Helices
-
-Hyperdimensional vectors that make up a Genome. Each Genome contains 10 Helices.
-
-## Base Pairs
-
-Fundamental data representations inside a Helix. Each Base Pair stores an attribute–value pair.
-
-## Genes
-
-Genes are unforgeable credentials that represent an owner’s digital identity. They include agents for security, identity, authentication, and authorization, and they are tied to a Vault and its owner. Only the holder of the Gene can access or move the associated assets.
-
-## Uniqueness Quantification & Evolution
-
-Onli ensures uniqueness through a non‑deterministic algorithm that evolves a Genome whenever operations like send or copy occur. Instead of duplicating data, the container’s state is updated, preserving a single global version. These evolutionary transfer mechanisms make Onli resistant to cloning, spoofing, and hacking, while enabling assets to maintain a real‑time global state across connected devices.
-
-Special Genomes that represent an owner’s digital identity. They contain agents for security, identity, authentication and authorization and are tied to a Vault and Owner【887808116772823†L21-L31】.
-
-## Agents
-
-Autonomous programs that compute base pairs. Agents operate within Vaults and OnliOne to enforce policies and implement behaviours.
-
-## Owners
-
-Human users of OnliOne. Each owner possesses a Gene and can own assets (Genomes). Owners authenticate and authorize actions via their Gene.
-
-## Issuers
-
-Special users that mint and issue assets to owners. Issuers own Treasuries.
-
-## Treasuries
-
-Special vaults that store newly minted, unissued assets.
-
-## Mint
-
-A special vault containing the algorithms for generating unowned assets (Genomes).
-
-## Appliances
-
-Applications running on the Onli Cloud OS. Appliances interact with owners and implement business logic (e.g., marketplaces, digital wallets). Developers build Appliances to connect clients (Onli You) to the Onli Cloud.
-
-## ONLI Cloud
-
-A cloud operating system that manages the operation and execution of the OnliOne network. It provides functions‑as‑a‑service (FaaS) for issuance, transfers, settlement and Oracle registration but never stores the asset itself【887808116772823†L88-L100】.
-
-### Architecture
-
-## Triad of Trust
-
-- Genomes: Unique hyperdimensional vector storage objects built from 10 Helices and 10 Base Pairs each. Each Genome holds content or data and cryptographic proofs ensuring uniqueness and integrity【887808116772823†L21-L31】.
-- Genes: Special Genomes representing identity and access control. Genes implement capability-based security and are bound to biometrics or devices. They allow the owner to use, exclude, transfer or destroy Genomes【887808116772823†L21-L31】.
-- Vaults: Self-contained execution environments (trusted execution environments) that store Genomes (assets) and Genes (owner identities). Vaults run on devices or servers using hardware isolation technologies (Intel SGX, AMD SEV, ARM TrustZone) and ensure actual possession storage【887808116772823†L21-L31】.
-## OnliOne components
-
-- Onli (the asset): The unitary digital object – a Genome. It carries its own history and proves its integrity without referencing a global ledger【887808116772823†L21-L31】.
-- Onli You: The application (mobile or desktop) that hosts a Vault and allows owners to interact with their assets. It includes an authenticator for secure identity.
-- Onli Cloud: A functions-as-a-service (FaaS) environment that orchestrates issuance, transfers, AskToMove/Locker flows, Oracle registration and settlement. Onli Cloud never stores asset data; it logs receipts and ensures atomic transfers【887808116772823†L88-L100】.
-Appliances: Client or server applications built by developers on top of Onli Cloud. Appliances provide user experiences and enforce business rules. They call Onli Cloud’s gRPC APIs to mint, move, or destroy Genomes【887808116772823†L88-L100】.
-- Onli One is a private network of OnliYou Owners (possessing gene), a secured and isolated from the public internet, allowing only authorized devices and apps to connect and exchange data with one another. 
-- Oracle: The replicated validation oracle that records events (Issue, AskToMove, Locker, ChangeOwner) to provide verifiable receipts and anchor states off-chain.
-- Locker: A settlement vault used to hold Genomes under conditions (payment, compliance or time). Movement through the Locker ensures atomic settlement.
-- Treasury & Mint: Special vaults used by Issuers. Treasury holds unissued Genomes; Mint contains algorithms to create new Genomes.
+These links host the authoritative protocol definitions and interactive examples used throughout this knowledge base.
